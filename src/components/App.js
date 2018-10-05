@@ -5,7 +5,8 @@ import { createStackNavigator } from 'react-navigation';
 import MainMenu from './MainMenu';
 import NewGame from './NewGame';
 import Game from './Game';
-import Collection from './Collection';
+import Collection from './Collection/Collection';
+import NewCollection from './Collection/NewCollection';
 import Shop from './Shop';
 import Settings from './Settings';
 
@@ -15,6 +16,7 @@ const RootStack = createStackNavigator(
     NewGame,
     Game,
     Collection,
+    NewCollection,
     Shop,
     Settings
   },
