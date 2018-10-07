@@ -9,12 +9,15 @@ export default class Collection extends Component {
   constructor(props) {
     super(props);
 
+    const { navigation } = props;
+    const collection = navigation.getParam('collection');
+
     this.state = {
-      name: '',
-      nameSet: false,
+      name: collection ? collection.name : '',
+      nameSet: !!collection,
       items: [],
       categories: {},
-      selectedItems: {}
+      selectedItems: collection ? collection.items : {}
     };
   }
 
@@ -49,13 +52,21 @@ export default class Collection extends Component {
 
   save = async () => {
     const collections = await storage.load('collections') || [];
+    const updatedCollections = collections.filter(({ name }) => name !== this.state.name);
 
-    collections.push({
+    const items = Object.keys(this.state.selectedItems).reduce((result, key) => {
+      if (this.state.selectedItems[key]) {
+        result[key] = true;
+      }
+      return result;
+    }, {});
+
+    updatedCollections.push({
       name: this.state.name,
-      items: this.state.selectedItems
+      items
     });
 
-    await storage.save('collections', collections);
+    await storage.save('collections', updatedCollections);
 
     this.props.navigation.navigate('Collection');
   }
