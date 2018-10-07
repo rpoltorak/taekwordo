@@ -28,10 +28,19 @@ async function remove(key) {
   }
 }
 
+async function clear() {
+  try {
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.log('Error during asyncstorage remove', error);
+  }
+}
+
 
 export default {
   save,
   load,
-  remove
+  remove,
+  clear
 }
 
