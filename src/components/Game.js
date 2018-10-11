@@ -31,7 +31,8 @@ export default class Game extends Component {
       points: 0,
       life: 3,
       end: false,
-      counter: 3
+      counter: 3,
+      recognizing: false
     };
 
     Voice.onSpeechStart = this.onSpeechStart.bind(this);
@@ -99,7 +100,11 @@ export default class Game extends Component {
 
   async startRecognizing(e) {
     try {
-      await Voice.start('en-US');
+      if (!this.state.recognizing) {
+        await this.setState({ recognizing: true });
+        await Voice.start('en-US');
+      }
+
     } catch (e) {
       console.error(e);
     }
@@ -107,6 +112,7 @@ export default class Game extends Component {
 
   async stopRecognizing(e) {
     try {
+      await this.setState({ recognizing: false });
       await Voice.stop();
     } catch (e) {
       console.error(e);
@@ -125,7 +131,7 @@ export default class Game extends Component {
       if (this.state.position < this.state.height) {
         const activeItem = this.state.items[this.state.activeIndex];
 
-        if (this.state.speechResults.includes(activeItem.name.toLowerCase())) {
+        if (this.state.speechResults.toString().includes(activeItem.name.toLowerCase())) {
           clearInterval(this.interval);
 
           const nextIndex = this.state.activeIndex + 1;
@@ -186,6 +192,10 @@ export default class Game extends Component {
   renderMainScene() {
     const activeItem = this.state.items[this.state.activeIndex];
 
+    if (!activeItem) {
+      return (<Text>{this.state.activeIndex}</Text>);
+    }
+
     return (
       <View style={styles.container}>
         <Image
@@ -197,12 +207,13 @@ export default class Game extends Component {
           {[...Array(this.state.life)].map((item, i) =>
             <Image
               style={styles.heart}
-              source={require('../../assets/images/heart.png')}
+              source={require('../../assets/images/ui/heart.png')}
               key={i}
             />
           )}
         </View>
         <Text style={styles.active}>{activeItem.name}</Text>
+        <Text>{JSON.stringify(this.state.speechResults)}</Text>
         <KeepAwake />
       </View>
     );

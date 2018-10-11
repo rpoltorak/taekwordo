@@ -1,27 +1,34 @@
 import React, { Component } from 'react';
-import { BackHandler, Button, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { BackHandler, StyleSheet } from 'react-native';
+import { Container, Header, Content, Button, Body, Text } from 'native-base';
 
 export default class Collection extends Component {
   render() {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
-        <Text style={{ fontSize: 30, color: '#FF0000', marginBottom: 50 }}>Taekwordo</Text>
-        <TouchableHighlight onPress={() => this.props.navigation.navigate('NewGame')}>
-          <Text style={styles.text}>New Game</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={() => this.props.navigation.navigate('Collection')}>
-          <Text style={styles.text}>Edit Collection</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={() => this.props.navigation.navigate('Shop')}>
-          <Text style={styles.text}>Shop</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={() => this.props.navigation.navigate('Settings')}>
-          <Text style={styles.text}>Settings</Text>
-        </TouchableHighlight>
-        <TouchableHighlight onPress={() => { BackHandler.exitApp(); }}>
-          <Text style={styles.text}>Exit</Text>
-        </TouchableHighlight>
-      </View>
+      <Container>
+        <Header>
+          <Body>
+            <Text style={{ fontSize: 30 }}>Taekwordo</Text>
+          </Body>
+        </Header>
+        <Content style={{ marginTop: 10 }}>
+          <Button full onPress={() => this.props.navigation.navigate('NewGame')} style={{ marginBottom: 5 }}>
+            <Text>New Game</Text>
+          </Button>
+          <Button full onPress={() => this.props.navigation.navigate('Collection')} style={{ marginBottom: 5 }}>
+            <Text>Collections</Text>
+          </Button>
+          {/* <Button full onPress={() => this.props.navigation.navigate('Shop')} style={{ marginBottom: 5 }}>
+            <Text>Shop</Text>
+          </Button> */}
+          {/* <Button full onPress={() => this.props.navigation.navigate('Settings')} style={{ marginBottom: 5 }}>
+            <Text>Settings</Text>
+          </Button> */}
+          <Button full onPress={() => { BackHandler.exitApp(); }}>
+            <Text>Exit</Text>
+          </Button>
+        </Content>
+      </Container>
     );
   }
 }
