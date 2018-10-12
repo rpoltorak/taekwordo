@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-video')
     compile project(':react-native-keep-awake')
     compile project(':react-native-voice')
     implementation fileTree(dir: "libs", include: ["*.jar"])

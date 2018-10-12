@@ -3,6 +3,7 @@ package com.taekwordo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.brentvatne.react.ReactVideoPackage;
 import com.corbt.keepawake.KCKeepAwakePackage;
 import com.wenkesj.voice.VoicePackage;
 import com.facebook.react.ReactNativeHost;
@@ -25,6 +26,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactVideoPackage(),
             new KCKeepAwakePackage(),
             new VoicePackage()
       );
