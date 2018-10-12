@@ -18,6 +18,9 @@ export default class Collection extends Component {
           <Button full onPress={() => this.props.navigation.navigate('Collection')} style={{ marginBottom: 5 }}>
             <Text>Collections</Text>
           </Button>
+          <Button full onPress={() => this.props.navigation.navigate('Gallery')} style={{ marginBottom: 5 }}>
+            <Text>Gallery</Text>
+          </Button>
           {/* <Button full onPress={() => this.props.navigation.navigate('Shop')} style={{ marginBottom: 5 }}>
             <Text>Shop</Text>
           </Button> */}

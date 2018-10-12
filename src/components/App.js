@@ -7,6 +7,7 @@ import NewGame from './NewGame';
 import Game from './Game';
 import Collection from './Collection';
 import ModifyCollection from './ModifyCollection';
+import Gallery from './Gallery';
 import Shop from './Shop';
 import Settings from './Settings';
 
@@ -17,6 +18,7 @@ const RootStack = createStackNavigator(
     Game,
     Collection,
     ModifyCollection,
+    Gallery,
     Shop,
     Settings
   },
