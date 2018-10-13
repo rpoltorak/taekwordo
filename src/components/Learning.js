@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   Button,
   StyleSheet,
   Text,
@@ -10,14 +11,18 @@ import {
 import Voice from 'react-native-voice';
 import KeepAwake from 'react-native-keep-awake';
 
+import Video from 'react-native-video';
+
 import game from '../game';
+import categories from '../categories';
 
 export default class Game extends Component {
   constructor(props) {
     super(props);
 
     const { navigation } = props;
-    const category = navigation.getParam('category');
+    // const category = navigation.getParam('category');
+    const category = categories[0];
 
     this.state = {
       category: category,
@@ -32,7 +37,9 @@ export default class Game extends Component {
       life: 3,
       end: false,
       counter: 3,
-      recognizing: false
+      recognizing: false,
+      mode: 'learning',
+      playedSound: false
     };
 
     Voice.onSpeechStart = this.onSpeechStart.bind(this);
@@ -83,9 +90,11 @@ export default class Game extends Component {
   onSpeechResults(e) {
     console.log('onSpeechResults', e);
 
-    this.setState({
-      speechResults: e.value.map(item => item.toLowerCase())
-    });
+    if (this.state.mode === 'playing') {
+      this.setState({
+        speechResults: e.value.map(item => item.toLowerCase())
+      });
+    }
 
     this.startRecognizing();
   }
@@ -119,56 +128,102 @@ export default class Game extends Component {
     }
   }
 
+  renderAudio = () => {
+    if (this.state.playedSound) {
+      const activeItem = this.state.items[this.state.activeIndex];
+
+      return (
+        <Video source={activeItem.sound}
+          ref={ref => this.player = ref}
+          onError={error => Alert.alert(JSON.stringify(error))}
+          audioOnly={true}
+          style={styles.backgroundVideo}
+        />
+      );
+    }
+  }
+
   async initGameLoop() {
-    this.setState({
+    await this.setState({
       started: true
     });
 
-    await this.startRecognizing();
+    if (this.state.mode === 'playing') {
+      await this.startRecognizing();
+    }
 
-    this.interval = setInterval(() => {
+    this.interval = setInterval(async () => {
+      const activeItem = this.state.items[this.state.activeIndex];
 
-      if (this.state.position < this.state.height) {
-        const activeItem = this.state.items[this.state.activeIndex];
-
-        if (this.state.speechResults.toString().includes(activeItem.name.toLowerCase())) {
+      if (this.state.mode === 'learning') {
+        if (this.state.position >= this.state.height) {
           clearInterval(this.interval);
 
-          const nextIndex = this.state.activeIndex + 1;
-
-          if (nextIndex >= this.state.items.length) {
-            this.setState({
-              points: this.state.points + 10,
-              end: true
-            });
-
-            this.stopRecognizing();
-            return;
-          } else {
-            this.setState({
-              position: -150,
-              points: this.state.points + 10,
-              activeIndex: nextIndex
-            });
-
-            this.initGameLoop();
-          }
-        } else {
           this.setState({
-            position: this.state.position + 1
+            position: -150,
+            mode: this.state.mode === 'playing' ? 'learning' : 'playing',
+            playedSound: false
+          });
+
+          this.initGameLoop();
+          return;
+        }
+
+        if (!this.state.playedSound && this.state.position >= this.state.height * 0.2) {
+          this.setState({
+            playedSound: true
           });
         }
-      } else {
-        clearInterval(this.interval);
 
         this.setState({
-          life: this.state.life - 1,
-          activeIndex: this.state.activeIndex + 1,
-          position: -150,
-          end: this.state.life <= 1
+          position: this.state.position + 1
         });
+      } else {
+        if (this.state.position < this.state.height) {
 
-        this.initGameLoop();
+          if (this.state.speechResults.toString().includes(activeItem.name.toLowerCase())) {
+            clearInterval(this.interval);
+
+            const nextIndex = this.state.activeIndex + 1;
+
+            if (nextIndex >= this.state.items.length) {
+              await this.setState({
+                points: this.state.points + 10,
+                end: true
+              });
+
+              this.stopRecognizing();
+              return;
+            } else {
+              await this.setState({
+                position: -150,
+                points: this.state.points + 10,
+                activeIndex: nextIndex,
+                mode: 'learning',
+                speechResults: []
+              });
+
+              this.initGameLoop();
+            }
+          } else {
+            await this.setState({
+              position: this.state.position + 1
+            });
+          }
+        } else {
+          clearInterval(this.interval);
+
+          await this.setState({
+            life: this.state.life - 1,
+            activeIndex: this.state.activeIndex + 1,
+            position: -150,
+            end: this.state.life <= 1,
+            mode: 'learning',
+            speechResults: []
+          });
+
+          this.initGameLoop();
+        }
       }
     }, 10);
   }
@@ -183,7 +238,8 @@ export default class Game extends Component {
       speechResults: [],
       points: 0,
       life: 3,
-      end: false
+      end: false,
+      mode: 'learning'
     });
 
     await this.initGameLoop();
@@ -196,12 +252,25 @@ export default class Game extends Component {
       return (<Text>{this.state.activeIndex}</Text>);
     }
 
+    if (this.state.mode === 'learning') {
+      return (
+        <View style={styles.container}>
+          <Image
+            style={[styles.word, { top: this.state.position }]}
+            source={activeItem.image}
+          />
+          {this.renderAudio()}
+        </View>
+      )
+    }
+
     return (
       <View style={styles.container}>
         <Image
           style={[styles.word, { top: this.state.position }]}
           source={activeItem.image}
         />
+        <Text>{this.state.mode}</Text>
         <Text style={styles.text}>Points: {this.state.points}</Text>
         <View style={styles.life}>
           {[...Array(this.state.life)].map((item, i) =>
@@ -294,6 +363,8 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   word: {
+    width: 100,
+    height: 100,
     margin: 10,
     position: 'absolute',
     top: 0
@@ -304,5 +375,12 @@ const styles = StyleSheet.create({
   heart: {
     width: 50,
     height: 50
+  },
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   }
 });

@@ -12,8 +12,11 @@ export default class Collection extends Component {
           </Body>
         </Header>
         <Content style={{ marginTop: 10 }}>
-          <Button full onPress={() => this.props.navigation.navigate('NewGame')} style={{ marginBottom: 5 }}>
+          <Button full onPress={() => this.props.navigation.navigate('NewGame', { page: 'Game' })} style={{ marginBottom: 5 }}>
             <Text>New Game</Text>
+          </Button>
+          <Button full onPress={() => this.props.navigation.navigate('NewGame', { page: 'Learning' })} style={{ marginBottom: 5 }}>
+            <Text>Learning</Text>
           </Button>
           <Button full onPress={() => this.props.navigation.navigate('Collection')} style={{ marginBottom: 5 }}>
             <Text>Collections</Text>

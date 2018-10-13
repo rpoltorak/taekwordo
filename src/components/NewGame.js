@@ -8,8 +8,12 @@ export default class NewGame extends Component {
   constructor(props) {
     super(props);
 
+    const { navigation } = props;
+    const page = navigation.getParam('page');
+
     this.state = {
-      category: categories[0].key
+      category: categories[0].key,
+      page
     };
   }
 
@@ -39,7 +43,7 @@ export default class NewGame extends Component {
             </Picker>
             <Button
               full
-              onPress={() => this.props.navigation.navigate('Game', {
+              onPress={() => this.props.navigation.navigate(this.state.page, {
                 category: categories.find(category => category.key === this.state.category)
               })}
             >
